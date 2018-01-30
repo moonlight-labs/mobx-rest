@@ -20,6 +20,7 @@ export default class Collection<T: Model> {
   @observable request: ?Request = null
   @observable error: ?ErrorObject = null
   @observable models: IObservableArray<T> = []
+  @observable rawResponse: ?{} = {}
 
   constructor (data: Array<{ [key: string]: any }> = []) {
     this.set(data)
@@ -299,7 +300,9 @@ export default class Collection<T: Model> {
 
     this.request = new Request(label, abort, 0)
 
-    let data: Array<{ [key: string]: any }>
+    // let data: Array<{ [key: string]: any }>
+    let data: {}
+
 
     try {
       data = await promise
@@ -313,7 +316,8 @@ export default class Collection<T: Model> {
     }
 
     runInAction('fetch-done', () => {
-      this.set(data, options)
+      this.rawResponse = data.raw
+      this.set(data.models, options)
       this.request = null
       this.error = null
     })
